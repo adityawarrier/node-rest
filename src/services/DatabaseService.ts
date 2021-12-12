@@ -1,20 +1,16 @@
-import mongoose, { CallbackError } from "mongoose";
+import mongoose from "mongoose";
 import { ConfigHelper, ConfigKeys } from "../utils/ConfigHelper";
 import { logger } from "../utils/Logger";
 
 class DatabaseService {
-  public connect = (): void => {
-    mongoose.connect(
-      ConfigHelper.getItem(ConfigKeys.DB_CONNECT),
-      (error: CallbackError) => {
-        if (error) {
-          logger.error("Error connecting to DB", error);
-          process.exit(1);
-        }
-
-        logger.info("DB connection established!");
-      }
-    );
+  public connect = async (): Promise<void> => {
+    try {
+      mongoose.connect(ConfigHelper.getItem(ConfigKeys.DB_CONNECT));
+      logger.info("DB connection established!");
+    } catch (error) {
+      logger.error("Error connecting to DB", error);
+      process.exit(1);
+    }
   };
 }
 

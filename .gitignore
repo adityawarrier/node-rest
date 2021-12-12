@@ -1,0 +1,8 @@
+# Dependencies
+node_modules/
+
+# Build artefacts
+build/
+
+# Environment Files
+.env

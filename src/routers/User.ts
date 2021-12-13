@@ -4,22 +4,31 @@ import { verifyToken } from "../middlewares/verifyToken";
 import { UserController } from "../controllers/User";
 import { UserValidators } from "../validators/User";
 
+enum UserRoutes {
+  REGISTER = "/register/",
+  LOGIN = "/login/",
+  LOGOUT = "/logout/",
+  SESSIONS = "/sessions/",
+}
+
 export const userRouter = Router();
 
 userRouter.post(
-  "/register/",
+  UserRoutes.REGISTER,
   validateSchema(UserValidators.register),
   UserController.register
 );
 
 userRouter.post(
-  "/login/",
+  UserRoutes.LOGIN,
   validateSchema(UserValidators.login),
   UserController.login
 );
 
 userRouter.get(
-  "/sessions/",
+  UserRoutes.SESSIONS,
   [validateSchema(UserValidators.sessions), verifyToken],
   UserController.session
 );
+
+userRouter.delete(UserRoutes.LOGOUT, verifyToken, UserController.logout);

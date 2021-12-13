@@ -99,9 +99,28 @@ const login = async (
 
     res.status(200).send({ accessToken, refreshToken });
   } catch (e: any) {
+    logger.error(e);
+
     res.status(400).send({
       status: "Error",
       message: "Error Loggin in",
+    });
+  }
+};
+
+const logout = async (req: Request, res: Response): Promise<void> => {
+  const { session } = res.locals.meta as IToken;
+
+  try {
+    await SessionModel.updateOne({ _id: session }, { valid: false });
+
+    res.status(200).send({ accessToken: null, refreshToken: null });
+  } catch (e) {
+    logger.error(e);
+
+    res.status(400).send({
+      status: "Error",
+      message: "Error Loggin out",
     });
   }
 };
@@ -110,9 +129,14 @@ const session = async (req: Request, res: Response): Promise<void> => {
   const { id: userId } = res.locals.meta as IToken;
 
   try {
-    const sessionList = await SessionModel.find({ user: userId, valid: true }).lean();
+    const sessionList = await SessionModel.find({
+      user: userId,
+      valid: true,
+    }).lean();
     res.status(200).send({ sessionList });
   } catch (e) {
+    logger.error(e);
+
     res.status(400).send({
       status: "Error",
       message: "Error fetching list of sessions",
@@ -123,5 +147,6 @@ const session = async (req: Request, res: Response): Promise<void> => {
 export const UserController = {
   register,
   login,
+  logout,
   session,
 };

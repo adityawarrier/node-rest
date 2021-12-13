@@ -2,6 +2,7 @@ enum ConfigKeys {
   PORT = "PORT",
   TOKEN_SECRET = "TOKEN_SECRET",
   DB_CONNECT = "DB_CONNECT",
+  SALT_WORK_FACTOR = "SALT_WORK_FACTOR",
 }
 
 class ConfigHelper {

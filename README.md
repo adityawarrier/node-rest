@@ -5,6 +5,7 @@ Playing around to zone in on an ultimate, scalable and maintainable folder struc
 ### TODO
 
 - [ ] Absolute imports
+- [ ] Global Error handler and formatter
 
 ### COMPLETED
 

@@ -2,11 +2,12 @@ import express from "express";
 import dotenv from "dotenv";
 import { ConfigHelper, ConfigKeys } from "./utils/ConfigHelper";
 import { logger } from "./utils/Logger";
-import { DatabaseService } from "./services/DatabaseService";
+import { DatabaseService } from "./services/Database";
 import { RootRouter } from "./routers/RootRouter";
 
 // APP INSTACE
 const app = express();
+app.use(express.json())
 
 // LOAD ENV VARIABLES
 dotenv.config();

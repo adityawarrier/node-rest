@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthService, IToken } from "../services/Auth";
+import { AuthService } from "../services/Auth";
 import { logger } from "../utils/Logger";
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {

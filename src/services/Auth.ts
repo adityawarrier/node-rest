@@ -54,6 +54,7 @@ class AuthService {
       };
     } catch (e: any) {
       logger.error(e.message);
+      
       return {
         valid: false,
         expired: e.message === "jwt expired",

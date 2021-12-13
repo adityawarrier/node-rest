@@ -25,9 +25,26 @@ const register = z.object({
       path: ["confirmPassword"],
     }),
 });
-
 export type RegisterUserRequestBody = TypeOf<typeof register>;
+
+const login = z.object({
+  body: z.object({
+    email: z
+      .string({
+        required_error: "Please enter your email address",
+      })
+      .email("Please enter a valid email address"),
+    password: z.string({
+      required_error: "Please enter your password",
+    }),
+  }),
+});
+export type LoginRequestBody = TypeOf<typeof login>;
+
+const sessions = z.object({});
 
 export const UserValidators = {
   register,
+  login,
+  sessions,
 };

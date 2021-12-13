@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
-import { UserModel } from "../models/User";
-import { AuthService } from "../services/Auth";
+import { AuthService, IToken } from "../services/Auth";
 import { logger } from "../utils/Logger";
+import { ConfigHelper, ConfigKeys } from "../utils/ConfigHelper";
 import { ObjectUtils } from "../utils/Object";
-import { RegisterUserRequestBody } from "../validators/User";
+import { LoginRequestBody, RegisterUserRequestBody } from "../validators/User";
+import { SessionModel } from "../models/Session";
+import { UserModel } from "../models/User";
 
 const register = async (
   req: Request<any, any, RegisterUserRequestBody["body"]>,
@@ -38,6 +40,88 @@ const register = async (
   }
 };
 
+const login = async (
+  req: Request<any, any, LoginRequestBody["body"]>,
+  res: Response
+): Promise<void> => {
+  const { email, password } = req.body;
+
+  const user = await UserModel.findOne({ email });
+
+  // IF USER DOES NOT EXIST IN THE DB
+  if (!user) {
+    res.status(404).send({
+      status: "Error",
+      message: `Email address ${email} does not exist! Please register!`,
+    });
+
+    return;
+  }
+
+  // VALIDATE PASSWORD
+  const isPasswordValid = await AuthService.validatePassword(
+    password,
+    user.password
+  );
+  if (!isPasswordValid) {
+    res.status(400).send({
+      status: "Error",
+      message: "Incorrect Password!",
+    });
+
+    return;
+  }
+
+  try {
+    // CREATE SESSION
+    const session = await SessionModel.create({
+      user: user._id,
+      userAgent: req.get("user-agent"),
+    });
+
+    // CREATE TOKENS
+    const accessToken = AuthService.createToken(
+      {
+        id: user._id,
+        name: user.name,
+        session: session._id,
+      },
+      { expiresIn: ConfigHelper.getItem(ConfigKeys.ACCESS_TOKEN_TTL) }
+    );
+    const refreshToken = AuthService.createToken(
+      {
+        id: user._id,
+        name: user.name,
+        session: session._id,
+      },
+      { expiresIn: ConfigHelper.getItem(ConfigKeys.REFRESH_TOKEN_TTL) }
+    );
+
+    res.status(200).send({ accessToken, refreshToken });
+  } catch (e: any) {
+    res.status(400).send({
+      status: "Error",
+      message: "Error Loggin in",
+    });
+  }
+};
+
+const session = async (req: Request, res: Response): Promise<void> => {
+  const { id: userId } = res.locals.meta as IToken;
+
+  try {
+    const sessionList = await SessionModel.find({ user: userId, valid: true });
+    res.status(200).send({ sessionList });
+  } catch (e) {
+    res.status(400).send({
+      status: "Error",
+      message: "Error fetching list of sessions",
+    });
+  }
+};
+
 export const UserController = {
   register,
+  login,
+  session,
 };

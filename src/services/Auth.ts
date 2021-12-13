@@ -1,18 +1,19 @@
-import bcryptjs from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ConfigHelper, ConfigKeys } from "../utils/ConfigHelper";
 
-interface IToken {
+export interface IToken {
   id: string;
   name: string;
+  session: string;
 }
 
 class AuthService {
   public hashPassword = async (password: string): Promise<string> => {
     const workFactor = ConfigHelper.getItem(ConfigKeys.SALT_WORK_FACTOR);
 
-    const salt = await bcryptjs.genSalt(parseInt(workFactor, 10));
-    const hashedPassword = await bcryptjs.hash(password, salt);
+    const salt = await bcrypt.genSalt(parseInt(workFactor, 10));
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     return hashedPassword;
   };
@@ -21,17 +22,17 @@ class AuthService {
     resPassword: string,
     modelPassword: string
   ): Promise<boolean> => {
-    return bcryptjs.compare(resPassword, modelPassword);
+    return bcrypt.compare(resPassword, modelPassword);
   };
 
-  // public createToken = (data: IToken): string => {
-  //   return jwt.sign(data, config().token.secret);
-  // };
+  public createToken = (data: IToken, options?: jwt.SignOptions): string => {
+    return jwt.sign(data, ConfigHelper.getItem(ConfigKeys.TOKEN_SECRET), options);
+  };
 
-  // public verifyToken = (token: string): IToken => {
-  //   return jwt.verify(token, config().token.secret) as IToken;
-  // };
+  public verifyToken = (token: string): IToken => {
+    return jwt.verify(token, ConfigHelper.getItem(ConfigKeys.TOKEN_SECRET)) as IToken;
+  };
 }
 
 const AS = new AuthService();
-export { AS as AuthService, IToken };
+export { AS as AuthService };

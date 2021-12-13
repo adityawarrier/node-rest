@@ -5,11 +5,11 @@ import { logger } from "../utils/Logger";
 const extractErrors = (
   error: ZodError
 ): {
-  key: (string | number);
+  key: string | number;
   message: string;
 }[] => {
   const errorList = error.errors.map((e: ZodIssue) => ({
-    key: e.path[0],
+    key: e.path.join(" >> "),
     message: e.message,
   }));
 
@@ -19,7 +19,8 @@ const extractErrors = (
 };
 
 export const validateSchema =
-  (schema: AnyZodObject) => (req: Request, res: Response, next: NextFunction) => {
+  (schema: AnyZodObject) =>
+  (req: Request, res: Response, next: NextFunction) => {
     try {
       const { query, params, body } = req;
       schema.parse({

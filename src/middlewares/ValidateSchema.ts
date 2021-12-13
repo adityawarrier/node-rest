@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodEffects, ZodError, ZodIssue, ZodObject } from "zod";
+import { AnyZodObject, ZodError, ZodIssue } from "zod";
 import { logger } from "../utils/Logger";
 
 const extractErrors = (
@@ -19,7 +19,7 @@ const extractErrors = (
 };
 
 export const validateSchema =
-  (schema: ZodEffects<ZodObject<any>) => (req: Request, res: Response, next: NextFunction) => {
+  (schema: AnyZodObject) => (req: Request, res: Response, next: NextFunction) => {
     try {
       const { query, params, body } = req;
       schema.parse({

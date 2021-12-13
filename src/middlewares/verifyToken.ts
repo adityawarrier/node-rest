@@ -14,7 +14,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const tokenPayload: IToken = AuthService.verifyToken(token);
+    const { token: tokenPayload } = AuthService.verifyToken(token);
     if (!tokenPayload) {
       throw new Error();
     }

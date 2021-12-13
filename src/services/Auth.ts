@@ -1,8 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Schema } from "mongoose";
-import { ConfigHelper, ConfigKeys } from "../utils/ConfigHelper";
 import { logger } from "../utils/Logger";
+import { ConfigHelper, ConfigKeys } from "../utils/ConfigHelper";
+import { SessionModel } from "../models/Session";
+import { UserModel } from "../models/User";
 
 export interface IToken {
   id: Schema.Types.ObjectId;
@@ -54,13 +56,43 @@ class AuthService {
       };
     } catch (e: any) {
       logger.error(e.message);
-      
+
       return {
         valid: false,
         expired: e.message === "jwt expired",
         token: null,
       };
     }
+  };
+
+  public reIssueToken = async (
+    refreshToken: string
+  ): Promise<string | null> => {
+    const { token: decoded } = this.verifyToken(refreshToken);
+    if (!decoded) {
+      return null;
+    }
+
+    const session = await SessionModel.findById(decoded.session);
+    if (!session || !session.valid) {
+      return null;
+    }
+
+    const user = await UserModel.findById(decoded.id).lean();
+    if (!user) {
+      return null;
+    }
+
+    const newAccessToken = this.createToken(
+      {
+        id: user._id,
+        name: user.name,
+        session: session._id,
+      },
+      { expiresIn: ConfigHelper.getItem(ConfigKeys.ACCESS_TOKEN_TTL) }
+    );
+
+    return newAccessToken;
   };
 }
 

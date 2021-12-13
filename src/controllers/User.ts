@@ -110,7 +110,7 @@ const session = async (req: Request, res: Response): Promise<void> => {
   const { id: userId } = res.locals.meta as IToken;
 
   try {
-    const sessionList = await SessionModel.find({ user: userId, valid: true });
+    const sessionList = await SessionModel.find({ user: userId, valid: true }).lean();
     res.status(200).send({ sessionList });
   } catch (e) {
     res.status(400).send({

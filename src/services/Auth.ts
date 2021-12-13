@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Schema } from "mongoose";
 import { ConfigHelper, ConfigKeys } from "../utils/ConfigHelper";
 import { logger } from "../utils/Logger";
 
 export interface IToken {
-  id: string;
+  id: Schema.Types.ObjectId;
   name: string;
   session: string;
 }

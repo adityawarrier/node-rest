@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { AuthService, IToken } from "../services/Auth";
 import { logger } from "../utils/Logger";
 import { ConfigHelper, ConfigKeys } from "../utils/ConfigHelper";
@@ -6,10 +6,12 @@ import { ObjectUtils } from "../utils/Object";
 import { LoginRequestBody, RegisterUserRequestBody } from "../validators/User";
 import { SessionModel } from "../models/Session";
 import { UserModel } from "../models/User";
+import { AppError, HttpStatusCode } from "../services/AppError";
 
 const register = async (
   req: Request<any, any, RegisterUserRequestBody["body"]>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { name, email, password } = req.body;
@@ -26,17 +28,16 @@ const register = async (
     logger.error(err);
 
     if (err?.code && err?.code === 11000) {
-      res.status(409).send({
-        status: "Error",
-        message: "User Already registered! Proceed to Login!",
-      });
+      next(
+        new AppError(
+          "User Already registered! Proceed to Login!",
+          HttpStatusCode.CONFLICT
+        )
+      );
       return;
     }
 
-    res.status(400).send({
-      status: "Error",
-      message: err.message,
-    });
+    next(new AppError(err.message, HttpStatusCode.BAD_REQUEST));
   }
 };
 

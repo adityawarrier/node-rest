@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validateSchema } from "../middlewares/ValidateSchema";
-import { verifyToken } from "../middlewares/verifyToken";
+import { verifyToken } from "../middlewares/VerifyToken";
 import { UserController } from "../controllers/User";
 import { UserValidators } from "../validators/User";
 

@@ -5,10 +5,10 @@ Playing around to zone in on an ultimate, scalable and maintainable folder struc
 ### TODO
 
 - [ ] Absolute imports
-- [ ] Global Error handler and formatter
 
 ### COMPLETED
 
+- [x] Global Error handler and formatter
 - [x] Config Helper
 - [x] Logger
 - [x] Database Service

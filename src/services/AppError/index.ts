@@ -17,3 +17,4 @@ export class AppError extends Error {
 }
 
 export { HttpStatusCode } from './constants';
+export { catchAsync } from './CatchAsync';

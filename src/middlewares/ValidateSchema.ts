@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AnyZodObject, ZodError, ZodIssue } from "zod";
+import { AppError, HttpStatusCode } from "../services/AppError";
 import { logger } from "../utils/Logger";
 
 const extractErrors = (
@@ -30,9 +31,6 @@ export const validateSchema =
       });
       next();
     } catch (err: any) {
-      res.status(400).send({
-        status: "Error",
-        message: extractErrors(err),
-      });
+      next(new AppError(extractErrors(err), HttpStatusCode.BAD_REQUEST));
     }
   };
